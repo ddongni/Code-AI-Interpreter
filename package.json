@@ -1,6 +1,6 @@
 {
   "name": "code-ai-interpreter",
-  "displayName": "Code AI Interpreter",
+  "displayName": "Code AI Interpreter (Korean)",
   "description": "This translates code line by line into human-readable language.",
   "version": "0.0.1",
   "publisher": "DongEunShin",
@@ -16,33 +16,21 @@
   "contributes": {
     "commands": [
       {
-        "command": "code-ai-interpreter.toggleAutoInterpret",
-        "title": "Toggle Auto Interpretation",
-        "category": "Code AI Interpreter",
-        "icon": "$(check)"
-      },
-      {
-        "command": "code-ai-interpreter.toggleClickInterpret",
-        "title": "Toggle Click Interpretation",
-        "category": "Code AI Interpreter",
-        "icon": "$(mouse)"
-      },
-      {
-        "command": "code-ai-interpreter.interpretCurrentLine",
-        "title": "Interpret Current Line",
-        "category": "Code AI Interpreter",
-        "icon": "$(comment)"
-      },
-      {
-        "command": "code-ai-interpreter.interpretFileByBlocks",
-        "title": "Interpret File by Blocks",
+        "command": "code-ai-interpreter.interpretFileLineByLine",
+        "title": "Interpret File Line by Line",
         "category": "Code AI Interpreter",
         "icon": "$(file-code)"
+      },
+      {
+        "command": "code-ai-interpreter.interpretSelectedLines",
+        "title": "Interpret Selected Lines",
+        "category": "Code AI Interpreter",
+        "icon": "$(selection)"
       }
     ],
     "keybindings": [
       {
-        "command": "code-ai-interpreter.interpretFileByBlocks",
+        "command": "code-ai-interpreter.interpretSelectedLines",
         "key": "cmd+r",
         "mac": "cmd+r",
         "when": "editorTextFocus"
@@ -89,7 +77,8 @@
             "Thai (ไทย)"
           ],
           "description": "Select the language for code interpretation",
-          "markdownDescription": "Select the language for code interpretation. The AI will explain code in the selected language."
+          "markdownDescription": "Select the language for code interpretation. The AI will explain code in the selected language.",
+          "order": 1
         }
       }
     }
