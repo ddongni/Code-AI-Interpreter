@@ -1,79 +1,102 @@
 # Code AI Interpreter
 
-A VSCode extension that automatically interprets code line by line into human-readable language.
+A VSCode extension that helps you understand code by translating it into human-readable explanations in your preferred language.
+
+## What is this?
+
+Code AI Interpreter automatically explains what your code does, block by block. It's like having a coding tutor right in your editor!
 
 ## Features
 
-- **Automatic Inline Interpretation**: When enabled, interpretation text is automatically displayed at the end of each code line
-- **Multiple Language Support**: Choose from 15+ languages for code interpretation (English, Korean, Japanese, Chinese, Spanish, French, German, and more)
-- **Real-time Updates**: When you modify code, the interpretation for changed lines is automatically updated
-- **Easy Toggle**: Turn the interpretation feature on and off easily with a single status bar button
+- **Block-by-Block Interpretation**: Press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux) to interpret entire file by code blocks
+- **Multiple Languages**: Get explanations in 15+ languages including English, Korean, Japanese, Chinese, and more
 
 ## Installation
 
 1. Open VSCode
-2. Click on the Extensions tab (the Extensions icon in the left sidebar)
+2. Go to Extensions (click the Extensions icon in the left sidebar, or press `Cmd+Shift+X` on Mac / `Ctrl+Shift+X` on Windows/Linux)
 3. Search for "Code AI Interpreter"
 4. Click the "Install" button
+5. Wait for installation to complete
 
-## Setup
+That's it! No additional setup needed.
 
-No additional setup required! The extension is ready to use out of the box.
+## How to Use
 
-## Usage
+### Method 1: Interpret Entire File by Blocks
 
-### Enable Interpretation
+This interprets your entire file, grouping code into logical blocks (functions, classes, if statements, etc.).
 
-1. Click the "Interpretation Off" button in the bottom right of the VSCode status bar
-2. When the button changes to "Interpretation On", the interpretation feature is activated
-3. Interpretation text will automatically appear at the end of each code line
-
-### Disable Interpretation
-
-- Click the "Interpretation On" button in the status bar again to turn off interpretation
-
-### Change Interpretation Language
-
-1. Open VSCode Settings (`Cmd+,` on Mac or `Ctrl+,` on Windows/Linux)
-2. Search for "Code AI Interpreter"
-3. Select your preferred language from the "Interpretation Language" dropdown
-4. The interpretation will automatically update to the selected language
-
-Supported languages: English, Korean, Japanese, Chinese (Simplified), Chinese (Traditional), Spanish, French, German, Portuguese, Russian, Italian, Arabic, Hindi, Vietnamese, Thai
-
-### Example
-
-When interpretation is enabled, it will display like this:
+1. Open any code file
+2. Press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux)
+3. Wait for the interpretation to complete (you'll see a progress notification)
+4. Explanations will appear as comments below each code block:
 
 ```javascript
-const x = 10;  💡 Initializes variable x with the value 10
-console.log(x);  💡 Outputs the value of variable x to the console
+function calculateSum(a, b) {
+  return a + b;
+} // 💡 This function calculates and returns the sum of two numbers
 ```
 
-## Notes
+## Change Language
 
-- When interpretation is enabled, API calls may occur each time you modify code
-- In files with large amounts of code, it may take time for interpretations to appear
-- It is recommended to enable interpretation only when needed
+You can get explanations in different languages:
+
+1. Open VSCode Settings:
+   - Mac: `Cmd+,`
+   - Windows/Linux: `Ctrl+,`
+2. Search for "Code AI Interpreter"
+3. Find "Interpretation Language" setting
+4. Select your preferred language from the dropdown
+5. Explanations will automatically update to the selected language
+
+**Supported Languages:**
+English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中文), Chinese Traditional (繁體中文), Spanish (Español), French (Français), German (Deutsch), Portuguese (Português), Russian (Русский), Italian (Italiano), Arabic (العربية), Hindi (हिन्दी), Vietnamese (Tiếng Việt), Thai (ไทย)
+
+## Tips
+
+- **For large files**: The block interpretation method (`Cmd+R` / `Ctrl+R`) is efficient for understanding entire files
+- **Best for learning**: Use block interpretation when reading unfamiliar code to understand the overall structure
 
 ## Troubleshooting
 
-### Interpretations are not showing
-- Check if the status bar shows "Interpretation On"
-- Try saving the code or reopening the file
+### Explanations are not showing
+
+- Make sure you're in a code file (not a text file)
+- Try saving the file (`Cmd+S` / `Ctrl+S`)
 - Try restarting VSCode
+- Make sure you pressed `Cmd+R` / `Ctrl+R` or used the command palette
 
-### Interpretations are too slow
-- Interpretations are processed asynchronously, so it may take time to display
-- For large files, only some lines may be interpreted (up to 100 lines)
+### Interpretations are slow
 
-### Having other issues?
-- Try updating VSCode to the latest version
-- Try reinstalling the extension
+- This is normal for large files - the extension processes code asynchronously
+- Block interpretation processes all blocks in the file, so it may take time for large files
+- Wait for the progress notification to complete
+
+### Error messages appear
+
+- Check your internet connection (the extension needs to connect to the server)
+- Try again after a few seconds
+- If errors persist, try restarting VSCode
+
+### Keyboard shortcut doesn't work
+
+- Make sure you're pressing `Cmd+R` on Mac or `Ctrl+R` on Windows/Linux
+- The shortcut only works when you're focused on a code editor
+- You can also use Command Palette: "Code AI Interpreter: Interpret File by Blocks"
 
 ## Requirements
 
-- VSCode 1.106.1 or higher
+- VSCode version 1.106.1 or higher
+- Internet connection (for API calls)
+
+## Need Help?
+
+If you're experiencing issues:
+
+1. Make sure VSCode is up to date
+2. Try reinstalling the extension
+3. Check the VSCode Output panel for error messages (View → Output → Select "Code AI Interpreter")
 
 ## License
 

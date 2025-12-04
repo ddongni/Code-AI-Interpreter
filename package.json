@@ -17,9 +17,35 @@
     "commands": [
       {
         "command": "code-ai-interpreter.toggleAutoInterpret",
-        "title": "Toggle Interpretation",
+        "title": "Toggle Auto Interpretation",
         "category": "Code AI Interpreter",
         "icon": "$(check)"
+      },
+      {
+        "command": "code-ai-interpreter.toggleClickInterpret",
+        "title": "Toggle Click Interpretation",
+        "category": "Code AI Interpreter",
+        "icon": "$(mouse)"
+      },
+      {
+        "command": "code-ai-interpreter.interpretCurrentLine",
+        "title": "Interpret Current Line",
+        "category": "Code AI Interpreter",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "code-ai-interpreter.interpretFileByBlocks",
+        "title": "Interpret File by Blocks",
+        "category": "Code AI Interpreter",
+        "icon": "$(file-code)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "code-ai-interpreter.interpretFileByBlocks",
+        "key": "cmd+r",
+        "mac": "cmd+r",
+        "when": "editorTextFocus"
       }
     ],
     "configuration": {
