@@ -16,6 +16,10 @@ A VSCode extension that automatically interprets code line by line into human-re
 3. Search for "Code AI Interpreter"
 4. Click the "Install" button
 
+## Setup
+
+No additional setup required! The extension is ready to use out of the box.
+
 ## Usage
 
 ### Enable Interpretation

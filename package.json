@@ -1,0 +1,89 @@
+{
+  "name": "code-ai-interpreter",
+  "displayName": "Code AI Interpreter",
+  "description": "This translates code line by line into human-readable language.",
+  "version": "0.0.1",
+  "publisher": "DongEunShin",
+  "icon": "icons/icon.png",
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-ai-interpreter.toggleAutoInterpret",
+        "title": "Toggle Interpretation",
+        "category": "Code AI Interpreter",
+        "icon": "$(check)"
+      }
+    ],
+    "configuration": {
+      "title": "Code AI Interpreter",
+      "properties": {
+        "codeAIInterpreter.interpretationLanguage": {
+          "type": "string",
+          "default": "English",
+          "enum": [
+            "English",
+            "Korean",
+            "Japanese",
+            "Chinese (Simplified)",
+            "Chinese (Traditional)",
+            "Spanish",
+            "French",
+            "German",
+            "Portuguese",
+            "Russian",
+            "Italian",
+            "Arabic",
+            "Hindi",
+            "Vietnamese",
+            "Thai"
+          ],
+          "enumDescriptions": [
+            "English",
+            "Korean (한국어)",
+            "Japanese (日本語)",
+            "Chinese (Simplified) (简体中文)",
+            "Chinese (Traditional) (繁體中文)",
+            "Spanish (Español)",
+            "French (Français)",
+            "German (Deutsch)",
+            "Portuguese (Português)",
+            "Russian (Русский)",
+            "Italian (Italiano)",
+            "Arabic (العربية)",
+            "Hindi (हिन्दी)",
+            "Vietnamese (Tiếng Việt)",
+            "Thai (ไทย)"
+          ],
+          "description": "Select the language for code interpretation",
+          "markdownDescription": "Select the language for code interpretation. The AI will explain code in the selected language."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.106.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.46.3",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
