@@ -6,12 +6,12 @@ const SERVER_URL = 'https://code-ai-interpreter.azurewebsites.net/api/code_ai_in
 // 해석 캐시
 const interpretationCache = new Map<string, string>();
 
-// 설정에서 언어 가져오기
+// Inlay Hints를 위한 해석 결과 저장 (문서 URI -> 줄 번호 -> 설명)
+const inlayHintsData = new Map<string, Map<number, string>>();
+
+// 언어를 한글로 고정
 function getInterpretationLanguage(): string {
-	const config = vscode.workspace.getConfiguration('codeAIInterpreter');
-	const language = config.get<string>('interpretationLanguage', 'English');
-	console.log(`[Code AI Interpreter] Current language setting: ${language}`);
-	return language;
+	return 'Korean';
 }
 
 // 여러 줄의 코드를 한 번에 해석
@@ -121,79 +121,77 @@ async function interpretLines(codeLines: string[]): Promise<Map<number, string>>
 	}
 }
 
-// 파일의 언어에 맞는 주석 기호 가져오기
-function getCommentPrefix(document: vscode.TextDocument): string {
-	const languageId = document.languageId;
-	
-	// 주석 기호 매핑
-	const commentMap: { [key: string]: string } = {
-		'javascript': '//',
-		'typescript': '//',
-		'javascriptreact': '//',
-		'typescriptreact': '//',
-		'java': '//',
-		'c': '//',
-		'cpp': '//',
-		'csharp': '//',
-		'go': '//',
-		'rust': '//',
-		'swift': '//',
-		'kotlin': '//',
-		'dart': '//',
-		'python': '#',
-		'ruby': '#',
-		'shellscript': '#',
-		'yaml': '#',
-		'perl': '#',
-		'php': '//',
-		'html': '<!--',
-		'xml': '<!--',
-		'css': '/*',
-		'scss': '//',
-		'less': '//',
-		'sql': '--',
-		'lua': '--',
-		'vb': "'",
-		'powershell': '#'
-	};
-	
-	return commentMap[languageId] || '//';
+// Inlay Hints Provider 구현
+class CodeInterpreterInlayHintsProvider implements vscode.InlayHintsProvider {
+	provideInlayHints(
+		document: vscode.TextDocument,
+		range: vscode.Range,
+		token: vscode.CancellationToken
+	): vscode.ProviderResult<vscode.InlayHint[]> {
+		const hints: vscode.InlayHint[] = [];
+		const uri = document.uri.toString();
+		const lineMap = inlayHintsData.get(uri);
+		
+		if (!lineMap) {
+			return hints;
+		}
+		
+		// 범위 내의 모든 줄에 대해 Inlay Hint 생성
+		for (let lineNumber = range.start.line; lineNumber <= range.end.line; lineNumber++) {
+			const explanation = lineMap.get(lineNumber);
+			if (explanation) {
+				const line = document.lineAt(lineNumber);
+				const position = new vscode.Position(lineNumber, line.text.length);
+				
+				const hint = new vscode.InlayHint(
+					position,
+					` 💡 ${explanation}`,
+					vscode.InlayHintKind.Type
+				);
+				
+				// 스타일 설정
+				hint.paddingLeft = true;
+				hint.paddingRight = false;
+				
+				hints.push(hint);
+			}
+		}
+		
+		return hints;
+	}
 }
 
-// 주석을 줄 아래에 삽입
-async function insertCommentBelowLine(editor: vscode.TextEditor, lineNumber: number, explanation: string) {
-	const document = editor.document;
-	const commentPrefix = getCommentPrefix(document);
-	const commentText = `${commentPrefix} 💡 ${explanation}`;
+// Inlay Hints 데이터 업데이트 및 UI 새로고침
+function updateInlayHints(document: vscode.TextDocument, explanations: Map<number, string>) {
+	const uri = document.uri.toString();
 	
-	// 다음 줄의 시작 위치 찾기
-	const nextLineNumber = lineNumber + 1;
-	const nextLine = nextLineNumber < document.lineCount 
-		? document.lineAt(nextLineNumber) 
-		: null;
+	// 기존 데이터 가져오기 또는 새로 생성
+	let lineMap = inlayHintsData.get(uri);
+	if (!lineMap) {
+		lineMap = new Map<number, string>();
+		inlayHintsData.set(uri, lineMap);
+	}
 	
-	// 다음 줄이 이미 주석인지 확인 (중복 방지)
-	if (nextLine && nextLine.text.trim().startsWith(commentPrefix)) {
-		// 이미 주석이 있으면 업데이트
-		const range = new vscode.Range(
-			new vscode.Position(nextLineNumber, 0),
-			new vscode.Position(nextLineNumber, nextLine.text.length)
-		);
-		await editor.edit(editBuilder => {
-			editBuilder.replace(range, commentText);
-		});
-	} else {
-		// 새 주석 삽입
-		const insertPosition = nextLineNumber < document.lineCount
-			? new vscode.Position(nextLineNumber, 0)
-			: new vscode.Position(lineNumber, document.lineAt(lineNumber).text.length);
+	// 해석 결과 업데이트
+	explanations.forEach((explanation, lineNumber) => {
+		lineMap.set(lineNumber, explanation);
+	});
+	
+	// Inlay Hints 새로고침을 위해 문서 변경 이벤트 트리거
+	// 작은 편집을 했다가 즉시 되돌려서 변경 이벤트 발생
+	const editor = vscode.window.activeTextEditor;
+	if (editor && editor.document.uri.toString() === uri) {
+		const lastLine = document.lineAt(document.lineCount - 1);
+		const endPosition = new vscode.Position(lastLine.lineNumber, lastLine.text.length);
 		
-		await editor.edit(editBuilder => {
-			if (nextLineNumber < document.lineCount) {
-				editBuilder.insert(insertPosition, commentText + '\n');
-			} else {
-				editBuilder.insert(insertPosition, '\n' + commentText);
-			}
+		// 공백 추가 후 즉시 제거하여 변경 이벤트 발생
+		editor.edit(editBuilder => {
+			editBuilder.insert(endPosition, ' ');
+		}).then(() => {
+			editor.edit(editBuilder => {
+				const range = new vscode.Range(endPosition, new vscode.Position(endPosition.line, endPosition.character + 1));
+				editBuilder.delete(range);
+			});
 		});
 	}
 }
@@ -246,12 +244,16 @@ async function interpretFileLineByLine() {
 		
 		progress.report({ increment: 50, message: 'Processing results...' });
 		
-		// 역순으로 처리하여 줄 번호가 변경되지 않도록 함
-		for (let i = lines.length - 1; i >= 0; i--) {
+		// 해석 결과를 실제 줄 번호에 매핑
+		const lineNumberMap = new Map<number, string>();
+		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			const explanation = explanations.get(i) || 'No explanation available';
-			await insertCommentBelowLine(editor, line.lineNumber, explanation);
+			lineNumberMap.set(line.lineNumber, explanation);
 		}
+		
+		// Inlay Hints 업데이트
+		updateInlayHints(document, lineNumberMap);
 		
 		progress.report({ increment: 100, message: 'Complete!' });
 	});
@@ -322,12 +324,16 @@ async function interpretSelectedLines() {
 		
 		progress.report({ increment: 50, message: 'Processing results...' });
 		
-		// 역순으로 처리하여 줄 번호가 변경되지 않도록 함
-		for (let i = lines.length - 1; i >= 0; i--) {
+		// 해석 결과를 실제 줄 번호에 매핑
+		const lineNumberMap = new Map<number, string>();
+		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			const explanation = explanations.get(i) || 'No explanation available';
-			await insertCommentBelowLine(editor, line.lineNumber, explanation);
+			lineNumberMap.set(line.lineNumber, explanation);
 		}
+		
+		// Inlay Hints 업데이트
+		updateInlayHints(document, lineNumberMap);
 		
 		progress.report({ increment: 100, message: 'Complete!' });
 	});
@@ -337,6 +343,13 @@ async function interpretSelectedLines() {
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Code AI Interpreter extension is now active!');
+
+	// Inlay Hints Provider 등록
+	const inlayHintsProvider = new CodeInterpreterInlayHintsProvider();
+	const inlayHintsDisposable = vscode.languages.registerInlayHintsProvider(
+		{ scheme: 'file' },
+		inlayHintsProvider
+	);
 
 	// 명령어: 파일 전체를 한줄씩 해석
 	const interpretFileLineByLineCommand = vscode.commands.registerCommand(
@@ -354,20 +367,10 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	);
 
-	// 설정 변경 감지 (언어 변경 시 캐시 초기화)
-	const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration((event) => {
-		if (event.affectsConfiguration('codeAIInterpreter.interpretationLanguage')) {
-			const newLanguage = getInterpretationLanguage();
-			interpretationCache.clear();
-			vscode.window.showInformationMessage(`Interpretation language changed to: ${newLanguage}`);
-			console.log(`[Code AI Interpreter] Language changed to: ${newLanguage}`);
-		}
-	});
-
 	context.subscriptions.push(
+		inlayHintsDisposable,
 		interpretFileLineByLineCommand,
-		interpretSelectedLinesCommand,
-		onDidChangeConfiguration
+		interpretSelectedLinesCommand
 	);
 }
 

@@ -94,57 +94,88 @@ def code_ai_interpreter(req: func.HttpRequest) -> func.HttpResponse:
 코드:
 {code_text}
 
-응답 형식 (JSON 배열):
+응답 형식 (JSON 배열만 반환, 다른 텍스트 없이):
 [
   {{"lineNumber": 1, "explanation": "첫 번째 줄 설명 ({language_name}로)"}},
   {{"lineNumber": 2, "explanation": "두 번째 줄 설명 ({language_name}로)"}},
   ...
 ]
 
-중요: 각 줄의 설명은 반드시 {language_name}로 작성하고, JSON 배열 형식으로만 반환해주세요. 다른 설명이나 주석은 추가하지 마세요."""
+중요: 
+- 각 줄의 설명은 반드시 {language_name}로 작성
+- JSON 배열 형식으로만 반환 (마크다운 코드 블록 없이)
+- 다른 설명이나 주석은 추가하지 마세요
+- 반드시 유효한 JSON 형식으로만 응답해주세요"""
             
             logging.info(f"Calling OpenAI API with {len(code_lines)} lines, language: {language_name}")
-            response = client.responses.create(
-                model="gpt-5-nano",
-                input=prompt
-            )
             
-            # 응답 파싱
-            response_text = response.output_text.strip() if response.output_text else "[]"
-            
-            # JSON 배열 추출 시도 (마크다운 코드 블록이나 다른 텍스트 제거)
-            import re
-            json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
-            if json_match:
-                response_text = json_match.group(0)
-            
+            # 최대 3번 재시도 (JSON 파싱 실패 시)
+            max_retries = 3
             explanations = []
-            try:
-                # JSON 배열 파싱 시도
-                parsed = json.loads(response_text)
-                if isinstance(parsed, list):
-                    explanations = parsed
-                else:
-                    raise ValueError("Response is not a list")
-            except (json.JSONDecodeError, ValueError):
-                # JSON 파싱 실패 시 각 줄에 대해 개별적으로 해석
-                logging.warning("Failed to parse response as JSON, interpreting lines individually")
-                for i, line in enumerate(code_lines):
-                    try:
-                        line_response = client.responses.create(
-                            model="gpt-5-nano",
-                            input=f"다음 코드를 {language_name}로 간단하게 1-2문장으로 설명해주세요. 반드시 {language_name}로만 응답해주세요:\n{line}"
-                        )
-                        explanations.append({
-                            "lineNumber": i + 1,
-                            "explanation": line_response.output_text.strip() if line_response.output_text else "No explanation"
-                        })
-                    except Exception as e:
-                        logging.error(f"Error interpreting line {i+1}: {str(e)}")
-                        explanations.append({
-                            "lineNumber": i + 1,
-                            "explanation": f"Error: {str(e)}"
-                        })
+            
+            for attempt in range(max_retries):
+                try:
+                    response = client.responses.create(
+                        model="gpt-5-nano",
+                        input=prompt
+                    )
+                    
+                    # 응답 파싱
+                    response_text = response.output_text.strip() if response.output_text else "[]"
+                    
+                    # JSON 배열 추출 시도 (마크다운 코드 블록이나 다른 텍스트 제거)
+                    import re
+                    # JSON 배열 패턴 찾기 (중첩된 중괄호 포함)
+                    json_match = re.search(r'\[[\s\S]*\]', response_text)
+                    if json_match:
+                        response_text = json_match.group(0)
+                    
+                    # JSON 배열 파싱 시도
+                    parsed = json.loads(response_text)
+                    if isinstance(parsed, list) and len(parsed) > 0:
+                        explanations = parsed
+                        logging.info(f"Successfully parsed JSON response with {len(explanations)} explanations")
+                        break
+                    else:
+                        raise ValueError("Response is not a valid list or is empty")
+                        
+                except (json.JSONDecodeError, ValueError) as e:
+                    logging.warning(f"Attempt {attempt + 1}/{max_retries} failed to parse response: {str(e)}")
+                    if attempt < max_retries - 1:
+                        # 재시도 전에 프롬프트를 더 명확하게 수정
+                        prompt = f"""다음 코드를 {language_name}로 각 줄마다 간단하게 1-2문장으로 설명해주세요.
+
+코드:
+{code_text}
+
+반드시 다음 형식의 JSON 배열만 반환하세요 (다른 텍스트 없이):
+[
+  {{"lineNumber": 1, "explanation": "설명"}},
+  {{"lineNumber": 2, "explanation": "설명"}}
+]
+
+중요: JSON 배열만 반환하고, {language_name}로 설명하세요."""
+                    else:
+                        # 마지막 시도 실패 시 기본 응답 생성
+                        logging.error("All retry attempts failed, creating default explanations")
+                        explanations = [
+                            {
+                                "lineNumber": i + 1,
+                                "explanation": f"코드 줄 {i + 1} (파싱 오류로 인해 기본 메시지)"
+                            }
+                            for i in range(len(code_lines))
+                        ]
+                except Exception as e:
+                    logging.error(f"Unexpected error on attempt {attempt + 1}: {str(e)}")
+                    if attempt == max_retries - 1:
+                        # 마지막 시도 실패 시 기본 응답 생성
+                        explanations = [
+                            {
+                                "lineNumber": i + 1,
+                                "explanation": f"오류 발생: {str(e)}"
+                            }
+                            for i in range(len(code_lines))
+                        ]
             
             return func.HttpResponse(
                 json.dumps({"explanations": explanations}),
