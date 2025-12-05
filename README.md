@@ -4,11 +4,13 @@ A VSCode extension that helps you understand code by translating it into human-r
 
 ## What is this?
 
-Code AI Interpreter automatically explains what your code does, block by block. It's like having a coding tutor right in your editor!
+Code AI Interpreter automatically explains what your selected code does, line by line. It's like having a coding tutor right in your editor! Select code lines and get explanations as comments below each line.
 
 ## Features
 
-- **Block-by-Block Interpretation**: Press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux) to interpret entire file by code blocks
+- **Line-by-Line Interpretation**: Select code lines and press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux) to get explanations
+- **Language-Specific Comments**: Automatically uses the correct comment syntax for your file type (e.g., `#` for Python, `//` for JavaScript)
+- **Indentation-Aware**: Comments are automatically aligned with your code's indentation level
 - **Multiple Languages**: Get explanations in 15+ languages including English, Korean, Japanese, Chinese, and more
 
 ## Installation
@@ -23,19 +25,33 @@ That's it! No additional setup needed.
 
 ## How to Use
 
-### Method 1: Interpret Entire File by Blocks
+### Interpret Selected Lines
 
-This interprets your entire file, grouping code into logical blocks (functions, classes, if statements, etc.).
+Select the code lines you want to understand and get explanations as comments below each line.
 
 1. Open any code file
-2. Press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux)
-3. Wait for the interpretation to complete (you'll see a progress notification)
-4. Explanations will appear as comments below each code block:
+2. Select the code lines you want to interpret
+3. Press `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux)
+4. Wait for the interpretation to complete (you'll see a progress notification)
+5. Explanations will appear as comments below each selected line:
 
+**Python example:**
+```python
+result = a + b
+# 🧠 두 변수의 합을 계산하여 result에 저장합니다
+```
+
+**JavaScript example:**
 ```javascript
-function calculateSum(a, b) {
-  return a + b;
-} // 💡 This function calculates and returns the sum of two numbers
+const result = a + b;
+// 🧠 두 변수의 합을 계산하여 result 상수에 저장합니다
+```
+
+**With indentation:**
+```python
+def hello():
+    print("Hello")
+    # 🧠 들여쓰기에 맞춰 주석이 자동으로 정렬됩니다
 ```
 
 ## Change Language
@@ -48,20 +64,45 @@ You can get explanations in different languages:
 2. Search for "Code AI Interpreter"
 3. Find "Interpretation Language" setting
 4. Select your preferred language from the dropdown
-5. Explanations will automatically update to the selected language
+5. Explanations will automatically use the selected language
 
 **Supported Languages:**
 English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中文), Chinese Traditional (繁體中文), Spanish (Español), French (Français), German (Deutsch), Portuguese (Português), Russian (Русский), Italian (Italiano), Arabic (العربية), Hindi (हिन्दी), Vietnamese (Tiếng Việt), Thai (ไทย)
 
+**Alternative method (Settings JSON):**
+1. Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
+2. Type "Preferences: Open User Settings (JSON)"
+3. Add the following:
+```json
+{
+  "codeAIInterpreter.interpretationLanguage": "Korean"
+}
+```
+
+## Comment Syntax
+
+The comment syntax automatically adapts to your file type:
+
+- **Python**: `# 🧠 설명`
+- **JavaScript/TypeScript/Java/C/C++/C#/Go/Rust**: `// 🧠 설명`
+- **HTML/XML**: `<!-- 🧠 설명 -->`
+- **CSS/SCSS/Less/Sass**: `/* 🧠 설명 */`
+- **SQL**: `-- 🧠 설명`
+- **Shell/Bash/YAML**: `# 🧠 설명`
+
 ## Tips
 
-- **For large files**: The block interpretation method (`Cmd+R` / `Ctrl+R`) is efficient for understanding entire files
-- **Best for learning**: Use block interpretation when reading unfamiliar code to understand the overall structure
+- **Select specific lines**: You can select multiple lines or even non-consecutive lines (using multiple selections with `Cmd+Click` / `Ctrl+Click`)
+- **Best for learning**: Select code sections you want to understand and get explanations as comments
+- **Comments are editable**: The inserted comments are part of your file, so you can edit or delete them as needed
+- **Indentation matching**: Comments automatically match your code's indentation level for better readability
+- **Language preference**: Set your preferred language in settings to get explanations in your native language
 
 ## Troubleshooting
 
 ### Explanations are not showing
 
+- Make sure you've selected code lines before pressing `Cmd+R` / `Ctrl+R`
 - Make sure you're in a code file (not a text file)
 - Try saving the file (`Cmd+S` / `Ctrl+S`)
 - Try restarting VSCode
@@ -69,9 +110,9 @@ English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中
 
 ### Interpretations are slow
 
-- This is normal for large files - the extension processes code asynchronously
-- Block interpretation processes all blocks in the file, so it may take time for large files
+- This is normal when interpreting many lines - the extension processes code asynchronously
 - Wait for the progress notification to complete
+- For better performance, select fewer lines at a time
 
 ### Error messages appear
 
@@ -82,8 +123,8 @@ English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中
 ### Keyboard shortcut doesn't work
 
 - Make sure you're pressing `Cmd+R` on Mac or `Ctrl+R` on Windows/Linux
-- The shortcut only works when you're focused on a code editor
-- You can also use Command Palette: "Code AI Interpreter: Interpret File by Blocks"
+- The shortcut only works when you're focused on a code editor and have selected some lines
+- You can also use Command Palette: "Code AI Interpreter: Interpret Selected Lines"
 
 ## Requirements
 

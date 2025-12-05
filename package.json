@@ -1,6 +1,6 @@
 {
   "name": "code-ai-interpreter",
-  "displayName": "Code AI Interpreter (Korean)",
+  "displayName": "Code AI Interpreter",
   "description": "This translates code line by line into human-readable language.",
   "version": "0.0.1",
   "publisher": "DongEunShin",
@@ -15,12 +15,6 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "code-ai-interpreter.interpretFileLineByLine",
-        "title": "Interpret File Line by Line",
-        "category": "Code AI Interpreter",
-        "icon": "$(file-code)"
-      },
       {
         "command": "code-ai-interpreter.interpretSelectedLines",
         "title": "Interpret Selected Lines",
@@ -42,6 +36,7 @@
         "codeAIInterpreter.interpretationLanguage": {
           "type": "string",
           "default": "English",
+          "displayName": "Interpretation Language",
           "enum": [
             "English",
             "Korean",
