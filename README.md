@@ -38,20 +38,20 @@ Select the code lines you want to understand and get explanations as comments be
 **Python example:**
 ```python
 result = a + b
-# 🧠 두 변수의 합을 계산하여 result에 저장합니다
+# 🧠 Calculates the sum of the two variables and stores it in result
 ```
 
 **JavaScript example:**
 ```javascript
 const result = a + b;
-// 🧠 두 변수의 합을 계산하여 result 상수에 저장합니다
+// 🧠 Calculates the sum of the two variables and stores it in the result constant
 ```
 
 **With indentation:**
 ```python
 def hello():
     print("Hello")
-    # 🧠 들여쓰기에 맞춰 주석이 자동으로 정렬됩니다
+    # 🧠 The comment is automatically aligned to match the indentation
 ```
 
 ## Change Language
@@ -67,7 +67,7 @@ You can get explanations in different languages:
 5. Explanations will automatically use the selected language
 
 **Supported Languages:**
-English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中文), Chinese Traditional (繁體中文), Spanish (Español), French (Français), German (Deutsch), Portuguese (Português), Russian (Русский), Italian (Italiano), Arabic (العربية), Hindi (हिन्दी), Vietnamese (Tiếng Việt), Thai (ไทย)
+English, Korean, Japanese, Chinese Simplified, Chinese Traditional, Spanish, French, German, Portuguese, Russian, Italian, Arabic, Hindi, Vietnamese, Thai
 
 **Alternative method (Settings JSON):**
 1. Press `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux)
@@ -83,12 +83,12 @@ English, Korean (한국어), Japanese (日本語), Chinese Simplified (简体中
 
 The comment syntax automatically adapts to your file type:
 
-- **Python**: `# 🧠 설명`
-- **JavaScript/TypeScript/Java/C/C++/C#/Go/Rust**: `// 🧠 설명`
-- **HTML/XML**: `<!-- 🧠 설명 -->`
-- **CSS/SCSS/Less/Sass**: `/* 🧠 설명 */`
-- **SQL**: `-- 🧠 설명`
-- **Shell/Bash/YAML**: `# 🧠 설명`
+- **Python**: `# 🧠 explanation`
+- **JavaScript/TypeScript/Java/C/C++/C#/Go/Rust**: `// 🧠 explanation`
+- **HTML/XML**: `<!-- 🧠 explanation -->`
+- **CSS/SCSS/Less/Sass**: `/* 🧠 explanation */`
+- **SQL**: `-- 🧠 explanation`
+- **Shell/Bash/YAML**: `# 🧠 explanation`
 
 ## Tips
 
